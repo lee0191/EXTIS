@@ -1,0 +1,12 @@
+ if (gameState == GAME_OVER) {
+ printf("게임 오버! Enter 키를 눌러 재시작\n");
+ }
+ 그렇지 않으면 (gameState == GAME_CLEAR) {
+ printf("Game Clear! Enter 키를 눌러 재시작\n");
+ }
+
+ SDL_RenderPresent(렌더);
+}
+
+
+아무리 챗gpt를 썻다고 해도 잠시나마 개발자의 기분을 아주 잘 알게 되어서 좋 았다.
