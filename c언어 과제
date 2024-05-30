@@ -1,0 +1,393 @@
+#include <SDL.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+
+// 화면 크기 설정
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
+
+// 패들 크기 설정
+const int PADDLE_WIDTH = 100;
+const int PADDLE_HEIGHT = 20;
+
+// 공 크기 설정
+const int BALL_SIZE = 20;
+
+// 아이템 크기 설정
+const int ITEM_SIZE = 20;
+
+// 벽돌 크기 설정
+const int BRICK_WIDTH = 80;
+const int BRICK_HEIGHT = 30;
+
+// 벽돌 행과 열 개수 설정
+const int BRICK_ROWS = 5;
+const int BRICK_COLS = 10;
+
+// 게임 상태 정의
+typeDefenum {
+ GAME_RUNNING, // 게임 진행 중
+ GAME_OVER, // 게임 오버
+ GAME_CLEAR // 게임 클리어
+} 게임 상태;
+
+// 패들 구조체 정의
+유형 기본 구조 {
+ intx, y;
+ 폭, 높이,
+} 패들;
+
+// 공 구조체 정의
+유형 기본 구조 {
+ intx, y;
+ 폭, 높이,
+ velX, velY에서;
+ 부울 액티브;
+} 볼;
+
+// 아이템 구조체 정의
+유형 기본 구조 {
+ intx, y;
+ 폭, 높이,
+    bool active;
+} Item;
+
+// 벽돌 구조체 정의
+typedef struct {
+    int x, y;
+    int width, height;
+    int hits;   // 남은 충돌 횟수
+    bool active;
+} Brick;
+
+// 초기화 함수
+bool init(SDL_Window** window, SDL_Renderer** renderer) {
+    // SDL 초기화
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    // 창 생성
+    *window = SDL_CreateWindow("Brick Breaker", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (*window == NULL) {
+        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    // 렌더러 생성
+    *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+    if (*renderer == NULL) {
+        printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+// 종료 함수
+void close(SDL_Window* window, SDL_Renderer* renderer) {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+// 게임 요소 초기화 함수
+void resetGame(Paddle* paddle, Ball* balls, int* ballCount, Item* item, Brick bricks[BRICK_ROWS][BRICK_COLS], GameState* gameState, int* score, int* speedTimer) {
+    *gameState = GAME_RUNNING;
+    *score = 0;
+    *speedTimer = 0;
+
+    // 패들 초기화
+    paddle->x = SCREEN_WIDTH / 2 - PADDLE_WIDTH / 2;
+    paddle->y = SCREEN_HEIGHT - PADDLE_HEIGHT - 10;
+    paddle->width = PADDLE_WIDTH;
+    paddle->height = PADDLE_HEIGHT;
+
+    // 공 초기화
+    *ballCount = 1;
+    balls[0].x = SCREEN_WIDTH / 2 - BALL_SIZE / 2;
+    balls[0].y = SCREEN_HEIGHT / 2 - BALL_SIZE / 2;
+    balls[0].width = BALL_SIZE;
+    balls[0].height = BALL_SIZE;
+    balls[0].velX = 5;
+    balls[0].velY = 5;
+    balls[0].active = true;
+ (inti = 1; i < 10; ++i) {
+ 공[이]active = false;
+    }
+
+    // 아이템 초기화
+ 항목->액티브 = false;
+
+    // 벽돌 초기화
+ (행 = 0; 행 < BRIK_ROWS; ++행) {
+ (intcol = 0; col < BRIK_COLS; ++col) {
+ 벽돌[줄][칼]x = col * BRIK_WIDTH;
+ 벽돌[줄][칼]y = 행 * BRIK_HIGHT;
+ 벽돌[줄][칼]폭 = BRIK_WIDTH;
+ 벽돌[줄][칼]높이 = BRIK_HIGHT;
+ 벽돌[줄][칼]hits = 1 + row % 3; // 각 벽돌에 남은 충돌 횟수 부여
+ 벽돌[줄][칼]active = true;
+        }
+    }
+}
+
+// 입력 처리 함수
+보이드 핸들 입력(부울*종료, 패들*패들, GameState*게임 상태) {
+ SDL_이벤트;
+ 반면 (SDL_PollEvent(&e)!= 0) {
+ (예: type == SDL_QUIT) {
+            *quit = true;
+        }
+        else if (e.type == SDL_KEYDOWN) {
+            // 게임 진행 중인 경우
+            if (*gameState == GAME_RUNNING) {
+                switch (e.key.keysym.sym) {
+                case SDLK_LEFT:
+                    paddle->x -= 20;
+                    if (paddle->x < 0) paddle->x = 0;
+                    break;
+                case SDLK_RIGHT:
+                    paddle->x += 20;
+                    if (paddle->x > SCREEN_WIDTH - paddle->width) paddle->x = SCREEN_WIDTH - paddle->width;
+                    break;
+                }
+            }
+            // 게임 오버 또는 클리어 상태에서 엔터키를 누르면 게임 재시작
+            else if (*gameState == GAME_OVER || *gameState == GAME_CLEAR) {
+                if (e.key.keysym.sym == SDLK_RETURN) {
+                    *gameState = GAME_RUNNING;
+                }
+            }
+        }
+    }
+}
+
+// 게임 상태 업데이트 함수
+void update(볼*볼, int*볼카운트, 패들*패들, 아이템* 아이템, 벽돌[B]RICK_ROWS[BRICK_COLS], 게임 상태* 게임 상태, int* 점수, int* speedTimer) {
+ 비활성 브릭스 = 0;
+
+    // 공의 속도 증가 타이머 업데이트
+ (*speedTimer)+;
+ (*speedTimer > = 900) { // 약 초(60FPS 기준)인 경우
+ (inti = 0; i < *ballCount; ++i) {
+ 공을 던지면velX > 0) 공[i].velX + = 1;
+ 다른 공[이]velX -= 1;
+ 공을 던지면velY > 0) 공[i].velY += 1;
+ 다른 공[이]velY -= 1;
+        }
+ *speedTimer = 0;
+    }
+
+ (inti = 0; i < *ballCount; ++i) {
+ 공을 던지면활성) 계속합니다.
+
+ 공[이]x + = 공[i]velX;
+ 공[이]y += 공[i]velY;
+
+        // 공이 벽에 부딪히는 경우
+ 공을 던지면x <= 0 || 공[i]x + 공[i]너비 >= SCREEN_WIDTH) {
+ 공[이]velX = -balls[i].velX;
+        }
+
+ 공을 던지면y <= 0) {
+ 공[이]velY = -balls[i].velY;
+        }
+
+        // 공이 패들에 부딪히는 경우
+ 공을 던지면y + 공[i]높이 >= 패들->y & &
+ 공[이]x + 공[i]폭 >= 패들->x & &
+ 공[이]x <= 패들->x + 패들->폭) {
+ 공[이]velY = -balls[i].velY;
+        }
+
+ // 공이 화면 바닥에 닿는 경우
+ 공을 던지면y + 공[i]높이 >= SCREEN_HIGHT) {
+ 공[이]active = false;
+ BallActive(볼액티브) = false(허위)를 붓습니다.
+ (int j = 0; j < *ballCount; ++j) {
+ 공을 던지면[j]능동) {
+ 임의의 BallActive = true;
+ 부서짐;
+                }
+            }
+ (!임의 BallActive) {
+ *게임 상태 = GAME_OVER;
+ SDL_Destroy 창(창);
+ SDL_Quit();
+#include <stdlib>.h>
+ // 공이 벽돌에 부딪히는 경우
+ (행 = 0; 행 < BRIK_ROWS; ++행) {
+보이드 리셋 게임(패들* 패들, 볼* 볼, int* 볼카운트, 아이템* 아이템, 브릭크[B]RICK_ROWS[BRICK_COLS], 게임 상태* 게임 상태, int* 점수, int* speedTimer) {
+ *게임 상태 = GAME_RUNING;
+ *점수 = 0;
+ *speedTimer = 0;
+ (brick->hits <= 0) {
+ brick->active = false;
+ paddle->x = SCREEN_WIDTH / 2 - PADE_WIDTH / 2;
+ paddle->y = SCREEN_HIGHT - Paddle_HIGHT - 10;
+ paddle->width = PADLE_WIDTH;
+ 패들->높이 = 패들_높이;
+구문 BALL_SIZE = 20;
+ 활성 브릭스++;
+ *볼 카운트 = 1;
+ 볼[0.x] = SCREEN_WIDTH / 2 - BALL_SIZE / 2;
+ 볼[0.y] = SCREEN_HIGHT / 2 - BALL_SIZE / 2;
+ 공[0]폭 = BALL_SIZE;
+ 공[0]높이 = BALL_SIZE;
+ 공[0]velX = 5;
+ 공[0]velY = 5;
+ 공[0]active = true;
+구문 BRIK_ROWS = 5;
+구성 요소 BRIK_COLS = 10;
+ // 아이템이 떨어지고 있을 때
+ (항목->액티브인 경우) {
+ 항목->y += 5;
+ // 패들과 아이템이 충돌하면 패들 크기 증가
+ if (항목->y + 항목->높이 >= paddle->y & &
+ 품명->x + 품명->폭->= 패들->x & &
+ 항목->x <= 패들->x + 패들->폭) {
+ 항목->액티브 = false;
+ 패들->폭 += 20;
+ }
+ // 아이템이 화면 바닥에 닿으면 사라짐
+ (항목->y +항목->높이 >= SCREEN_HEIGHT) {
+ 항목->액티브 = false;
+ }
+ }
+
+ // 랜덤하게 아이템 생성
+ (rand () % 1000 < 5 & & !item-> active인 경우) {
+ 항목->x = 랜드 () %(SCREEN_WIDTH - ITEM_SIZE);
+ 항목->y = 0;
+ 항목->폭 = ITEM_사이즈;
+ 항목->높이 = ITEM_사이즈;
+ 항목->액티브 = true;
+ *stit = true;
+}
+ 그렇지 않은 경우(예: type == SDL_KEYDOWN) {
+ 부울 액티브;
+ (*gameState == GAME_RUNING) {
+ 스위치(예: 키)keysym.sym) {
+ 케이스 SDLK_LEFT:
+ paddle->x -= 20;
+ (paddle->x < 0) 패들->x = 0인 경우;
+ SDL_SetRenderDrawColor(렌더, 255, 255, 255, 255);
+ SDL_Rect paddleRect = {paddle->x, paddle->y, paddle->폭, paddle->높이 };
+ SDL_RenderFillRect(렌더, &paddleRect);
+
+ // 공 렌더링
+ SDL_SetRenderDrawColor(렌더, 255, 0, 0, 255);
+ (inti = 0; i < ball Count; ++i) {
+ 공을 던지면능동) {
+ SDL_Rect ballRect = {balls[i.x, balls[i]y, balls[i].폭, 공[이]높이 };
+ SDL_RenderFillRect(렌더, &ballRect);
+ }
+ }
+
+ // 아이템 렌더링
+ (항목->액티브인 경우) {
+ SDL_SetRenderDrawColor(렌더, 0, 255, 0, 255);
+ SDL_Rect itemRect = { item->x, item->y, item->너비, item->높이 };
+ SDL_RenderFillRect(렌더, &itemRect);
+ }
+
+ // 벽돌 렌더링
+ (행 = 0; 행 < BRIK_ROWS; ++행) {
+ (intcol = 0; col < BRIK_COLS; ++col) {
+ if (bricks[행][col])능동) {
+ 스위치(bricks[행][col]히트) {
+ 케이스 3:
+ SDL_SetRenderDrawColor(렌더, 255, 0, 0, 255); // 빨간색
+ 부서짐;
+ 케이스 2:
+ SDL_SetRenderDrawColor(렌더, 255, 255, 0, 255); // 노란색
+ 부서짐;
+ 케이스 1:
+ SDL_SetRenderDrawColor(렌더, 0, 255, 0, 255); // 초록색
+ 부서짐;
+ }
+ SDL_Rect brickRect = {brick[row][col.x], brick[row][col.col.y], brick[row][col.col.폭, 벽돌[줄][색]높이 };
+ SDL_RenderFillRect(렌더, &brickRect);
+ }
+ }
+ }
+
+ // 게임 오버 또는 게임 클리어 메시지 렌더링
+ if (gameState == GAME_OVER) {
+ printf("게임 오버! Enter 키를 눌러 재시작\n");
+ }
+ 그렇지 않으면 (gameState == GAME_CLEAR) {
+ printf("Game Clear! Enter 키를 눌러 재시작\n");
+ }
+
+ SDL_RenderPresent(렌더);
+}
+
+intain(argc, char* args[]) {
+ SDL_Windows* 창 = NULL;
+ SDL_Renderer* Renderer = NULL;
+
+ (!init(&window, &렌더) {
+ 공[이]velY = -balls[i].velY;
+ }
+ (brick->액티브인 경우) {
+ 활성 브릭스++;
+ }
+ }
+ }
+ }
+ intball Count;
+ // 남은 벽돌이 없으면 게임 클리어
+ (active Bricks == 0인 경우) {
+ *게임 상태 = GAME_CLEAR;
+ }
+
+ // 아이템이 떨어지고 있을 때
+ (항목->액티브인 경우) {
+ 항목->y += 5;
+ // 패들과 아이템이 충돌하면 패들 크기 증가
+ if (항목->y + 항목->높이 >= paddle->y & &
+ 품명->x + 품명->폭->= 패들->x & &
+ 항목->x <= 패들->x + 패들->폭) {
+ 항목->액티브 = false;
+ 패들->폭 += 20;
+ }
+ // 아이템이 화면 바닥에 닿으면 사라짐
+
+ 닫기(window, 렌더러);
+
+ 반환 0;
+}
+보이드 핸들 입력(bool* 종료, 패들* 패들, GameState* gameState, bool* restart) {
+ SDL_이벤트;
+ 반면 (SDL_PollEvent(&e)!= 0) {
+ (예: type == SDL_QUIT) {
+ *stit = true;
+ }
+ 그렇지 않은 경우(예: type == SDL_KEYDOWN) {
+ // 게임 진행 중인 경우
+ (*gameState == GAME_RUNING) {
+ 스위치(예: 키)keysym.sym) {
+ 케이스 SDLK_LEFT:
+ paddle->x -= 20;
+ (paddle->x < 0) 패들->x = 0인 경우;
+ 부서짐;
+ case SDLK_RIGHT:
+ paddle->x += 20;
+ (paddle->x > SCREEN_WIDTH - paddle->width) paddle->x = SCREEN_WIDTH - paddle->width인 경우;
+ 부서짐;
+ }
+ }
+ // 게임 오버 또는 클리어 상태에서 엔터키를 누르면 게임 재시작
+ 그렇지 않으면 (*GAME 상태 == GAME_OVER || *GAME 상태 == GAME_CLEAR) {
+ 만약에(e.key)키시미sym == SDLK_RETURN) {
+ *restart = true;
+ }
+ }
+ }
+ }
+}
