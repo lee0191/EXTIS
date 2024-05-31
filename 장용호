@@ -1,0 +1,821 @@
+#include "sub.h"
+
+intain(argc, char* argv[])
+{
+	
+ printf (" start\n");
+ Windows With Rect("Block Breaker", SCREEN_WIDTH, SCREEN_HIGHT) 생성;
+ //리턴 게임 1 ();
+ 반환 0;
+}
+
+
+
+#include "sub.h"
+
+// 전처리
+
+// 함수 정의
+
+void printf2(inta)
+{
+ printf ("%d\n", a);
+}
+
+// SDL_Renderer에 사각형을 그리는 함수
+
+void drawRect(SDL_Renderer* 렌더러, int x, int, int width, int 높이, SDL_Color color) {
+ SDL_SetRenderDrawColor(렌더, color.r, color.g, color.b, color.a);
+ SDL_Rectrect = { x - (너비 / 2), y - (높이 / 2), 너비, 높이 };
+ SDL_RenderFillRect(렌더, &rect);
+}
+
+보이드 드로우박스(SDL_렌더*렌더, SDL_Rectrect, SDL_Color color) {
+ SDL_SetRenderDrawColor(렌더, color.r, color.g, color.b, color.a);
+ SDL_Rect 박스 = {rect.x - (rect.w / 2), rect.y - (rect.h / 2), rect.w, rect.h };
+ SDL_RenderFillRect(렌더, &rect);
+}
+
+// 창을 만들고 초기화 하는 함수
+SDL_Window* 창 만들기(const char* 제목, int width, int 높이) {
+ // SDL 라이브러리 초기화
+ (SDL_Init(SDL_INIT_VIDEO))!= 0) {
+ fprintf(stderr, "SDL 초기화 실패: %s\n", SDL_GetError();
+ NULL을 반환합니다.
+ }
+
+ // SDL_ttf 라이브러리 초기화
+ 만약 (TTF_Init()!= 0) {
+ fprintf(stderr, "SDL_ttf 초기화 실패: %s\n", TTF_GetError();
+ SDL_Quit();
+ NULL을 반환합니다.
+ }
+
+ // 창 생성
+ SDL_WINDOW* 창 = SDL_CreateWindow(제목, SDL_WINDOWPOS_CERENTED, SDL_WINDOW_CERENTED, 너비, 높이, SDL_WINDOW_SHOW | SDL_WINDOW_FOCUS | SDL_WINDOW_MUSE_FOCUS);
+ (window == NULL) {
+ fprintf(stderr, "창 생성 실패: %s\n", SDL_GetError();
+ TTF_Quit();
+ SDL_Quit();
+ NULL을 반환합니다.
+ }
+
+ 반환 창;
+}
+
+이중 계산가속도(이중 초기가속도, 이중 deltaTime) {
+ // 가속도 = 초기 가속도 + 시간 * 변화율
+ 초기 가속 * deltaTime을 반환합니다.
+}
+
+void createWithRect(const char* 제목, int 너비, int 높이) {
+ // 창 생성
+ SDL_Window* 창 = 창 만들기(제목, 너비, 높이);
+ 만약 (! window) {
+ 반환;
+ }
+
+ // 렌더러 생성
+ SDL_Renderer* Renderer = SDL_CreateRenderer(윈도우, -1, SDL_RENDERER_Acelerated | SDL_RENDERER_PresentVSYNC);
+ 만약 (!렌더) {
+ printf("렌더러를 만들 수 없습니다: %s\n", SDL_GetError();
+ SDL_Destroy 창(창);
+ SDL_Quit();
+ 반환;
+ }
+
+ // 검은색 배경으로 채우기
+ SDL_Set RenderDraw Color(렌더, 0, 0, 0, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 초기 위치 설정 (화면 상단 중앙)
+ intect X = 폭 / 2;
+ intectY = -높이 / 2; // 화면 위쪽 밖에서 시작
+ 목표 Y = 높이 / 2;
+
+ // 사각형 색 그리기
+ SDL_Color Color1 = {255, 255, 255, 255}; // R, G, B, A
+ SDL_Color Color2 = { 0, 0, 0, 255 }; // R, G, B, A
+
+ // 사각형을 화면 중앙으로 이동시키는 애니메이션
+ float deltaTime = 0.125f; // 시간 간격
+ 부유 속도 Y = 0.0f; // 초기 속도
+ 플로트 가속도 Y = 0.33f; // Y 축 가속도
+ char가 센터 = 8에 도달했습니다.
+
+ (float 타이머 = 0, 타이머 <= 400, 타이머 += deltaTime) {
+ // 위치 업데이트
+ rectY += speedY * delta Time * 100;
+
+ // 화면 지우기
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 그리기
+ DrawRect(렌더, rectX, rectY, 460, 640, Color1);
+ DrawRect(렌더, rectX, rectY, 440, 620, Color2);
+
+ 텍스트 S1(렌더, "차단", (SDL_Rect) {rectX, rectY - 120, 320, 80});
+ 텍스트 S1(렌더, "게임 시작", (SDL_Rect) {rectX, rectY + 0, 320, 80};
+ 텍스트 S1(렌더, "끝", (SDL_Rect) {rectX, rectY + 120, 320, 80});
+
+ // 화면 업데이트
+ SDL_RenderPresent(렌더);
+
+ // 화면 중앙에 도달하면 속도 반전
+ (Center & & rectY >= targetY에 도달한 경우) {
+ 센터에 도착했습니다--;
+ speed Y = -speed Y / 1.56; // 속도 반전 및 감속
+ }
+ 그렇지 않은 경우(센터 <= 0에 도달함)
+ {
+ 부서짐;
+ }
+
+ // 속도 업데이트
+ 속도 Y += 가속도 Y * 델타 시간;
+
+ // 시간 간격만큼 대기
+ SDL_Delay((Uint32)(deltaTime * 8));
+ }
+
+    
+
+ // 2초 대기
+ // SDL_Delay(2000);
+
+ title Renderer(창, Renderer, rectX, rectY)
+
+ // 종료 처리
+ 청소(window, 렌더러);
+}
+
+void title Renderer(SDL_Windows* 창, SDL_Renderer* Renderer, intectX, intectY)
+{
+
+ 서명되지 않은 int 박스 번호 = 0;
+    
+ 한편 (1)
+ {
+
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 그리기
+ drawRect(렌더, rectX, rectY, 460, 640, (SDL_Color){ 255, 255, 255, 255, 255});
+ drawRect(렌더, rectX, rectY, 440, 620, (SDL_Color){ 0, 0, 0, 255});
+
+ 텍스트 S1(렌더, "차단", (SDL_Rect) {rectX, rectY - 120, 320, 80});
+ (TextS2(렌더, "게임 시작", (SDL_Rect) {rectX, rectY + 0, 320, 80}, 1, & boxNumber)
+ {
+ 제목 RendererBox1로 이동합니다.
+ }
+ (TextS2(렌더, "끝", (SDL_Rect) {rectX, rectY + 120, 320, 80}, 2, & boxNumber)
+ {
+ 제목 RendererBox2로 이동합니다.
+ }
+
+ // 화면 업데이트
+ SDL_RenderPresent(렌더);
+ }
+        
+ titleRenderBox1:
+        
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+ SDL_RenderPresent(렌더);
+
+ 게임 1(window, 렌더러);
+ 프린트 ("리트\n");
+ title Renderer(창, Renderer, rectX, rectY)
+    
+ 제목 RendererEnd로 이동합니다.
+ titleRenderBox2:
+
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+ SDL_RenderPresent(렌더);
+
+
+ titleRenderEnd:
+ 프린트 f ("과\n");
+}
+
+void renderText(SDL_Renderer* Renderer, constchar* 텍스트, SDL_Color textColor, SDL_Color bgColor, SDL_Rect textBox, inttextSize) {
+    
+ //폰트 크기 생성
+ TTF_Font* resizedFont = TTF_OpenFont("arial.ttf", textSize);
+ (!크기 조정된 글꼴) {
+ printf("폰트를 로드하지 못했습니다: %s\n"", TTF_GetError();
+ 반환;
+ }
+ // 텍스트 표면 생성
+ SDL_Surface* 텍스트Surface = TTF_RenderText_Blended(크기 조정된 글꼴, 텍스트, 텍스트 색상);
+ if (!textSurface) {
+ printf("텍스트 표면을 만들 수 없습니다: %s\n"", TTF_GetError();
+ TTF_CloseFont(크기 조정된 Font);
+ 반환;
+ }
+
+ // 텍스트 텍스처 생성
+ SDL_TextTextTextTextTextTextTextText=SDL_CreateFromSurface(렌더, 텍스트 표면);
+ SDL_자유 표면(텍스트 표면);
+ if (!textTextText) {
+ printf("텍스트 텍스처를 만들 수 없습니다: %s\n"", SDL_GetError();
+ TTF_CloseFont(크기 조정된 Font);
+ 반환;
+ }
+
+ // 텍스트 위치 계산 (박스의 중심)
+ SDL_Rect 텍스트Rect;
+ textRect.w = textSurface->w;
+ textRect.h = textSurface->h;
+ textRect.x = textBox.x + (0 - textRect.w) / 2;
+ textRect.y = textBox.y + (0 - textRect.h) / 2;
+
+ // 박스 그리기
+ drawRect(렌더, textBox.x, textBox.y, textBox.w, textBox.h, bgColor)를 그립니다.
+
+ // 텍스트 그리기
+ SDL_RenderCopy(렌더, textTextText, NULL, &textRect);
+ SDL_파괴텍스쳐(텍스트 텍스쳐);
+ TTF_CloseFont(크기 조정된 Font);
+}
+
+
+ void TextS1(SDL_Renderer * Renderer, constchar* txet, SDL_Rect TextBox)
+{
+ SDL_Color textColor = { 0, 0, 0, 255};
+ SDL_Color bgColor = {255, 255, 0, 255};
+
+
+ int textSize = 20; // 텍스트 크기(점)
+ renderText(렌더, txet, textColor, bgColor, textBox, textSize);
+}
+
+bool TextS2(SDL_Renderer * Renderer, const char* txet, SDL_Rect TextBox, intid, int* boxNumber)
+{
+ SDL_Color textColor = { 0, 0, 0, 255};
+ int textSize = 20; // 텍스트 크기(점)
+
+ SDL_Color bgColor = {255, 255, 0, 255};
+ if (id == *box Number)
+ {
+ bgColor = (SDL_Color){ 255, 0, 0, 255 };
+ }
+
+ renderText(렌더, txet, textColor, bgColor, textBox, textSize);
+ 반환 절차입력(렌더, textBox, id, boxNumber);
+}
+
+보이드 정리(SDL_Windows* 창, SDL_Renderer* Renderer) {
+ 만약 (렌더) {
+ SDL_DestroyRenderer(렌더);
+ }
+ 만약 (window) {
+ SDL_Destroy 창(창);
+ }
+ TTF_Quit();
+ SDL_Quit();
+}
+
+부울 공정입력(SDL_Renderer* 렌더러, SDL_Rect boxRect, intid, int* boxNumber) {
+
+ bool은 = false입니다.
+
+ SDL_Event 이벤트;
+ 반면 (SDL_PollEvent(&이벤트) {
+ 스위치(event.type) {
+ 케이스 SDL_Mouse BUTTONDOWN:
+ 만약에 (사건이)단추버튼 == SDL_BUTTON_LEFT) {
+ 만약 (*box Number == id)
+ {
+ = 참입니다.
+ }
+ }
+ 부서짐;
+ 케이스 SDL_MUSE MOTION:
+ if (event.motion.x >= boxRect.x - boxRect.w / 2 & & event.motion.x <= boxRect.x + boxRect.w / 2 & & &
+ event.motion.y >= boxRect.y - boxRect.h / 2 & event.motion.y <= boxRect.y + boxRect.h / 2) {
+ *box Number = id;
+ }
+ 부서짐;
+
+ 케이스 SDL_QUIT:
+ 거짓으로 반환합니다.
+ 케이스 SDL_KEYDOWN:
+ switch(event.key).keysym.sym) {
+ 케이스 SDLK_UP:
+ 스위치(*box Number)
+ {
+ case 0: *box 번호 = 2;
+ 부서짐;
+ 케이스 1: *box 번호 = 2;
+ 부서짐;
+ 케이스 2: *box 번호 = 1;
+ 부서짐;
+ 기본값: *box Number = 1;
+ }
+ 부서짐;
+ 케이스 SDLK_DOWN:
+ 스위치(*box Number)
+ {
+ case 0: *box 번호 = 1;
+ 부서짐;
+ 케이스 1: *box 번호 = 2;
+ 부서짐;
+ 케이스 2: *box 번호 = 1;
+ 부서짐;
+ 기본값: *box Number = 2;
+ }
+ 부서짐;
+            
+ 케이스 SDLK_RETURN:
+ 케이스 SDLK_SPACE:
+ 만약 (*box Number == id)
+ {
+ = 참입니다.
+ }
+ 부서짐;
+ 기본값:
+ 부서짐;
+ }
+ 부서짐;
+ 기본값:
+ 부서짐;
+ }
+ }
+ 반환은;
+}
+
+
+
+#include "sub.h"
+
+// 전처리
+
+// 함수 정의
+
+void printf2(inta)
+{
+ printf ("%d\n", a);
+}
+
+// SDL_Renderer에 사각형을 그리는 함수
+
+void drawRect(SDL_Renderer* 렌더러, int x, int, int width, int 높이, SDL_Color color) {
+ SDL_SetRenderDrawColor(렌더, color.r, color.g, color.b, color.a);
+ SDL_Rectrect = { x - (너비 / 2), y - (높이 / 2), 너비, 높이 };
+ SDL_RenderFillRect(렌더, &rect);
+}
+
+보이드 드로우박스(SDL_렌더*렌더, SDL_Rectrect, SDL_Color color) {
+ SDL_SetRenderDrawColor(렌더, color.r, color.g, color.b, color.a);
+ SDL_Rect 박스 = {rect.x - (rect.w / 2), rect.y - (rect.h / 2), rect.w, rect.h };
+ SDL_RenderFillRect(렌더, &rect);
+}
+
+// 창을 만들고 초기화 하는 함수
+SDL_Window* 창 만들기(const char* 제목, int width, int 높이) {
+ // SDL 라이브러리 초기화
+ (SDL_Init(SDL_INIT_VIDEO))!= 0) {
+ fprintf(stderr, "SDL 초기화 실패: %s\n", SDL_GetError();
+ NULL을 반환합니다.
+ }
+
+ // SDL_ttf 라이브러리 초기화
+ 만약 (TTF_Init()!= 0) {
+ fprintf(stderr, "SDL_ttf 초기화 실패: %s\n", TTF_GetError();
+ SDL_Quit();
+ NULL을 반환합니다.
+ }
+
+ // 창 생성
+ SDL_WINDOW* 창 = SDL_CreateWindow(제목, SDL_WINDOWPOS_CERENTED, SDL_WINDOW_CERENTED, 너비, 높이, SDL_WINDOW_SHOW | SDL_WINDOW_FOCUS | SDL_WINDOW_MUSE_FOCUS);
+ (window == NULL) {
+ fprintf(stderr, "창 생성 실패: %s\n", SDL_GetError();
+ TTF_Quit();
+ SDL_Quit();
+ NULL을 반환합니다.
+ }
+
+ 반환 창;
+}
+
+이중 계산가속도(이중 초기가속도, 이중 deltaTime) {
+ // 가속도 = 초기 가속도 + 시간 * 변화율
+ 초기 가속 * deltaTime을 반환합니다.
+}
+
+void createWithRect(const char* 제목, int 너비, int 높이) {
+ // 창 생성
+ SDL_Window* 창 = 창 만들기(제목, 너비, 높이);
+ 만약 (! window) {
+ 반환;
+ }
+
+ // 렌더러 생성
+ SDL_Renderer* Renderer = SDL_CreateRenderer(윈도우, -1, SDL_RENDERER_Acelerated | SDL_RENDERER_PresentVSYNC);
+ 만약 (!렌더) {
+ printf("렌더러를 만들 수 없습니다: %s\n", SDL_GetError();
+ SDL_Destroy 창(창);
+ SDL_Quit();
+ 반환;
+ }
+
+ // 검은색 배경으로 채우기
+ SDL_Set RenderDraw Color(렌더, 0, 0, 0, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 초기 위치 설정 (화면 상단 중앙)
+ intect X = 폭 / 2;
+ intectY = -높이 / 2; // 화면 위쪽 밖에서 시작
+ 목표 Y = 높이 / 2;
+
+ // 사각형 색 그리기
+ SDL_Color Color1 = {255, 255, 255, 255}; // R, G, B, A
+ SDL_Color Color2 = { 0, 0, 0, 255 }; // R, G, B, A
+
+ // 사각형을 화면 중앙으로 이동시키는 애니메이션
+ float deltaTime = 0.125f; // 시간 간격
+ 부유 속도 Y = 0.0f; // 초기 속도
+ 플로트 가속도 Y = 0.33f; // Y 축 가속도
+ char가 센터 = 8에 도달했습니다.
+
+ (float 타이머 = 0, 타이머 <= 400, 타이머 += deltaTime) {
+ // 위치 업데이트
+ rectY += speedY * delta Time * 100;
+
+ // 화면 지우기
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 그리기
+ DrawRect(렌더, rectX, rectY, 460, 640, Color1);
+ DrawRect(렌더, rectX, rectY, 440, 620, Color2);
+
+ 텍스트 S1(렌더, "차단", (SDL_Rect) {rectX, rectY - 120, 320, 80});
+ 텍스트 S1(렌더, "게임 시작", (SDL_Rect) {rectX, rectY + 0, 320, 80};
+ 텍스트 S1(렌더, "끝", (SDL_Rect) {rectX, rectY + 120, 320, 80});
+
+ // 화면 업데이트
+ SDL_RenderPresent(렌더);
+
+ // 화면 중앙에 도달하면 속도 반전
+ (Center & & rectY >= targetY에 도달한 경우) {
+ 센터에 도착했습니다--;
+ speed Y = -speed Y / 1.56; // 속도 반전 및 감속
+ }
+ 그렇지 않은 경우(센터 <= 0에 도달함)
+ {
+ 부서짐;
+ }
+
+ // 속도 업데이트
+ 속도 Y += 가속도 Y * 델타 시간;
+
+ // 시간 간격만큼 대기
+ SDL_Delay((Uint32)(deltaTime * 8));
+ }
+
+
+
+ // 2초 대기
+ // SDL_Delay(2000);
+
+ title Renderer(창, Renderer, rectX, rectY)
+
+ // 종료 처리
+ 청소(window, 렌더러);
+}
+
+void title Renderer(SDL_Windows* 창, SDL_Renderer* Renderer, intectX, intectY)
+{
+
+ 서명되지 않은 int 박스 번호 = 0;
+
+ 한편 (1)
+ {
+
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+
+ // 사각형 그리기
+ drawRect(렌더, rectX, rectY, 460, 640, (SDL_Color) {255, 255, 255, 255});
+ drawRect(렌더, rectX, rectY, 440, 620, (SDL_Color) { 0, 0, 255});
+
+ 텍스트 S1(렌더, "차단", (SDL_Rect) {rectX, rectY - 120, 320, 80});
+ (TextS2(렌더, "게임 시작", (SDL_Rect) {rectX, rectY + 0, 320, 80}, 1, & boxNumber)
+ {
+ 제목 RendererBox1로 이동합니다.
+ }
+ (TextS2(렌더, "끝", (SDL_Rect) {rectX, rectY + 120, 320, 80}, 2, & boxNumber)
+ {
+ 제목 RendererBox2로 이동합니다.
+ }
+
+ // 화면 업데이트
+ SDL_RenderPresent(렌더);
+ }
+
+titleRenderBox1:
+
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+ SDL_RenderPresent(렌더);
+
+ 게임 1(window, 렌더러);
+ 프린트 ("리트\n");
+ title Renderer(창, Renderer, rectX, rectY)
+
+ 제목 RendererEnd로 이동합니다.
+titleRenderBox2:
+
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+ SDL_RenderPresent(렌더);
+
+
+titleRenderEnd:
+ 프린트 f ("과\n");
+}
+
+void renderText(SDL_Renderer* Renderer, constchar* 텍스트, SDL_Color textColor, SDL_Color bgColor, SDL_Rect textBox, inttextSize) {
+
+ //폰트 크기 생성
+ TTF_Font* resizedFont = TTF_OpenFont("arial.ttf", textSize);
+ (!크기 조정된 글꼴) {
+ printf("폰트를 로드하지 못했습니다: %s\n"", TTF_GetError();
+ 반환;
+ }
+ // 텍스트 표면 생성
+ SDL_Surface* 텍스트Surface = TTF_RenderText_Blended(크기 조정된 글꼴, 텍스트, 텍스트 색상);
+ if (!textSurface) {
+ printf("텍스트 표면을 만들 수 없습니다: %s\n"", TTF_GetError();
+ TTF_CloseFont(크기 조정된 Font);
+ 반환;
+ }
+
+ // 텍스트 텍스처 생성
+ SDL_TextTextTextTextTextTextTextText=SDL_CreateFromSurface(렌더, 텍스트 표면);
+ SDL_자유 표면(텍스트 표면);
+ if (!textTextText) {
+ printf("텍스트 텍스처를 만들 수 없습니다: %s\n"", SDL_GetError();
+ TTF_CloseFont(크기 조정된 Font);
+ 반환;
+ }
+
+ // 텍스트 위치 계산 (박스의 중심)
+ SDL_Rect 텍스트Rect;
+ textRect.w = textSurface->w;
+ textRect.h = textSurface->h;
+ textRect.x = textBox.x + (0 - textRect.w) / 2;
+ textRect.y = textBox.y + (0 - textRect.h) / 2;
+
+ // 박스 그리기
+ drawRect(렌더, textBox.x, textBox.y, textBox.w, textBox.h, bgColor)를 그립니다.
+
+ // 텍스트 그리기
+ SDL_RenderCopy(렌더, textTextText, NULL, &textRect);
+ SDL_파괴텍스쳐(텍스트 텍스쳐);
+ TTF_CloseFont(크기 조정된 Font);
+}
+
+
+void TextS1(SDL_Renderer* Renderer, constchar* txet, SDL_Rect textBox)
+{
+ SDL_Color textColor = { 0, 0, 0, 255};
+ SDL_Color bgColor = {255, 255, 0, 255};
+
+
+ int textSize = 20; // 텍스트 크기(점)
+ renderText(렌더, txet, textColor, bgColor, textBox, textSize);
+}
+
+bool TextS2(SDL_Renderer* Renderer, const char* txet, SDL_Rect TextBox, intid, int* boxNumber)
+{
+ SDL_Color textColor = { 0, 0, 0, 255};
+ int textSize = 20; // 텍스트 크기(점)
+
+ SDL_Color bgColor = {255, 255, 0, 255};
+ if (id == *box Number)
+ {
+ bgColor = (SDL_Color){ 255, 0, 0, 255 };
+ }
+
+ renderText(렌더, txet, textColor, bgColor, textBox, textSize);
+ 반환 절차입력(렌더, textBox, id, boxNumber);
+}
+
+보이드 정리(SDL_Windows* 창, SDL_Renderer* Renderer) {
+ 만약 (렌더) {
+ SDL_DestroyRenderer(렌더);
+ }
+ 만약 (window) {
+ SDL_Destroy 창(창);
+ }
+ TTF_Quit();
+ SDL_Quit();
+}
+
+부울 공정입력(SDL_Renderer* 렌더러, SDL_Rect boxRect, intid, int* boxNumber) {
+
+ bool은 = false입니다.
+
+ SDL_Event 이벤트;
+ 반면 (SDL_PollEvent(&이벤트) {
+ 스위치(event.type) {
+ 케이스 SDL_Mouse BUTTONDOWN:
+ 만약에 (사건이)단추버튼 == SDL_BUTTON_LEFT) {
+ 만약 (*box Number == id)
+ {
+ = 참입니다.
+ }
+ }
+ 부서짐;
+ 케이스 SDL_MUSE MOTION:
+ if (event.motion.x >= boxRect.x - boxRect.w / 2 & & event.motion.x <= boxRect.x + boxRect.w / 2 & & &
+ event.motion.y >= boxRect.y - boxRect.h / 2 & event.motion.y <= boxRect.y + boxRect.h / 2) {
+ *box Number = id;
+ }
+ 부서짐;
+
+ 케이스 SDL_QUIT:
+ 거짓으로 반환합니다.
+ 케이스 SDL_KEYDOWN:
+ switch(event.key).keysym.sym) {
+ 케이스 SDLK_UP:
+ 스위치(*box Number)
+ {
+ case 0: *box 번호 = 2;
+ 부서짐;
+ 케이스 1: *box 번호 = 2;
+ 부서짐;
+ 케이스 2: *box 번호 = 1;
+ // 사각형 그리기
+ drawRect(렌더, rectX, rectY, 460, 640, (SDL_Color) {255, 255, 255, 255});
+ drawRect(렌더, rectX, rectY, 440, 620, (SDL_Color) { 0, 0, 255});
+ 부서짐;
+ 텍스트 S1(렌더, "차단", (SDL_Rect) {rectX, rectY - 120, 320, 80});
+ (TextS2(렌더, "게임 시작", (SDL_Rect) {rectX, rectY + 0, 320, 80}, 1, & boxNumber)
+ {
+ 제목 RendererBox1로 이동합니다.
+ }
+ (TextS2(렌더, "끝", (SDL_Rect) {rectX, rectY + 120, 320, 80}, 2, & boxNumber)
+ {
+ 제목 RendererBox2로 이동합니다.
+ }
+ 기본값: *box Number = 2;
+ // 화면 업데이트
+ SDL_RenderPresent(렌더);
+ }
+ 케이스 SDLK_RETURN:
+titleRenderBox1:
+ 만약 (*box Number == id)
+ SDL_Set RenderDraw Color(렌더, 24, 24, 24, 255);
+ SDL_RenderClear(렌더);
+ SDL_RenderPresent(렌더);
+ 부서짐;
+ 게임 1(window, 렌더러);
+ 프린트 ("리트\n");
+ }
+ 부서짐;
+ 기본값:
+ 부서짐;
+ }
+ }
+ 반환은;
+}
+
+#include "onics.h"
+
+int game1(SDL_Window* window, SDL_Renderer* renderer) {
+
+    /*
+
+    SDL_Window* window = NULL;
+    SDL_Renderer* renderer = NULL;
+
+    if (!initSDL(&window, &renderer)) {
+        printf("Failed to initialize!\n");
+        return -1;
+    }
+
+    */
+
+    TTF_Font* font = TTF_OpenFont("arial.ttf", 60); // Adjust the path and size
+    if (!font) {
+        printf("Failed to load font! TTF_Error: %s\n", TTF_GetError());
+        return -1;
+    }
+
+    SDL_Rect paddle = { WINDOW_WIDTH / 2 - PADDLE_WIDTH / 2, WINDOW_HEIGHT - 50, PADDLE_WIDTH, PADDLE_HEIGHT };
+    SDL_Rect ball = { WINDOW_WIDTH / 2 - BALL_SIZE / 2, WINDOW_HEIGHT / 2, BALL_SIZE, BALL_SIZE };
+    int ballVelX = 200;
+    int ballVelY = 200;
+
+    Block blocks[BLOCK_ROWS][BLOCK_COLUMNS];
+    for (int i = 0; i < BLOCK_ROWS; i++) {
+        for (int j = 0; j < BLOCK_COLUMNS; j++) {
+            blocks[i][j].rect = (SDL_Rect){ j * (BLOCK_WIDTH + 6) + 47, i * (BLOCK_HEIGHT + 6) + 47, BLOCK_WIDTH, BLOCK_HEIGHT };
+            blocks[i][j].color = (SDL_Color){ 0, 0, 255, 255 }; // Blue color
+            blocks[i][j].alive = true;
+        }
+    }
+
+    bool quit = false;
+    SDL_Event e;
+    int lives = 5;
+    bool gameOver = false;
+    bool gameWon = false;
+    Uint32 lastTime = SDL_GetTicks();
+
+    while (!quit) {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            }
+        }
+
+        if (gameOver || gameWon) {
+            if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_SPACE) {
+                    quit = true;
+                }
+            }
+            continue;
+        }
+
+        // 마우스에 따라 패들 이동
+        int mouseX;
+        SDL_GetMouseState(&mouseX, NULL);
+        paddle.x = mouseX - PADDLE_WIDTH / 2;
+
+        Uint32 currentTime = SDL_GetTicks();
+        float deltaTime = (currentTime - lastTime) / 1000.0f;
+        lastTime = currentTime;
+
+        ball.x += ballVelX * deltaTime;
+        ball.y += ballVelY * deltaTime;
+
+ (ball.x <= 0 | ball.x + BALL_SIZE >= WINDOW_WIDTH) {
+ ballVelX = -ballVelX;
+ }
+ 만약 (ball.y <= 0) {
+ ballVelY = -ballVelY;
+ }
+
+ (ball.y + BALL_SIZE >= WINDOW_HEIGHT) {
+ 생명은--;
+ (lives <= 0) {
+ GameOver = true;
+ }
+ 그 외 {
+ ball.x = WINDOW_WIDTH / 2 - BALL_SIZE / 2;
+ ball.y = WINDOW_HIGHT / 2;
+ ballVelX = 200;
+ ballVelY = 200;
+ }
+ }
+
+ 충돌 점검(&ball, &paddle, 블록, &ballVelX, &ballVelY);
+
+ gameWon = true;
+ (inti = 0; i < BLOCK_ROWS; i++) {
+ (int j = 0; j < BLOCK_COLUMns; j++) {
+ if (블록[i]][j]인 경우살아있는) {
+ GameWon = false;
+ }
+ }
+ }
+
+ SDL_Set RenderDraw Color(렌더, 0, 0, 0, 255);
+ SDL_RenderClear(렌더);
+
+ 생명을 그리다(렌더, 생명);
+ 드로패들(렌더, &패들);
+ 드로우볼(렌더, &볼);
+ 블록 그리기(렌더, 블록);
+        
+
+ SDL_Color Red Color = {255, 0, 0, 255}; // Red color
+ SDL_Color WhiteColor = { 255, 255, 255, 255}; // WhiteColor
+ 만약 (게임 오버) {
+ 렌더 엔드 스크린(렌더, "게임 오버", 글꼴, 빨간색)
+ }
+ 그렇지 않으면 (게임원) {
+ 렌더 엔드 스크린(렌더, "게임 클리어", 글꼴, 흰색);
+ }
+
+ SDL_RenderPresent(렌더);
+ }
+
+ /*
+ TTF_CloseFont(font);
+ 닫기 SDL(윈도우, 렌더러);
+ */
+
+ 반환 0;
+}
+
+소감: ai가 프로그래머를 대체할 날은 아직 한참 멀었다는 것을 몸으로 느꼈습니다.
